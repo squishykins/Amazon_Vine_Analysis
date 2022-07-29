@@ -1,12 +1,36 @@
 # Amazon_Vine_Analysis
 
-## Overview of the analysis: 
+<img src="https://user-images.githubusercontent.com/101137700/181667608-df9f2829-8c87-43fb-a147-774f942b734e.png" width="50"> <img src="https://user-images.githubusercontent.com/101137700/181668163-8e2e28e1-b464-465b-a1a3-29bb096f56ff.png" width="50"> <img src="https://user-images.githubusercontent.com/101137700/181668354-3954e73d-4258-4bb6-922e-7c3aa4bbca7d.png" width="50"> <img src="https://user-images.githubusercontent.com/101137700/181668486-649e7cf7-8af9-4e7e-a9fd-948a43a31e4b.png" width="50">
+
+## Overview of the analysis : 
 
 This is an analysis of the Amazon Vine program using one of the 50 datasets provided.  The Amazon Vine program is a service that allows manufacturers and publishers to receive reviews for their products. Companies pay a small fee to Amazon and provide products to Amazon Vine members, who are then required to publish a review. Using the Mobile Apps dataset and PySpark to perform the ETL process to extract the dataset and transform the data, connect to an AWS RDS instance, and load the transformed data into pgAdmin. Using PySpark again to determine if there is any bias toward favorable reviews from Vine members in the Mobile Apps dataset. 
 
-## Results: 
+## Results : 
 
 - How many Vine reviews and non-Vine reviews were there?
+
+First creating the vine table dataframe :
+
+```
+vine_df = df.select(["review_id", "star_rating", "helpful_votes", "total_votes", "vine", "verified_purchase"])
+```
+
+Filtering that dataframe to only products with more than 20 votes and that are majority helpful :
+
+```
+vote_df = vine_df.filter("total_votes>=20")
+helpful_votes_df = vote_df.filter((vote_df.helpful_votes / vote_df.total_votes) >= 0.5)
+```
+
+Using the helpful_votes_df it is then split into Vine and non-Vine dataframes :
+
+```
+vine_review_df = helpful_votes_df.filter((helpful_votes_df.vine) == "Y")
+non_vine_review_df = helpful_votes_df.filter((helpful_votes_df.vine) == "N")
+```
+
+Once we have the two dataframes we can then analyze their contents :
 
 ![image](https://user-images.githubusercontent.com/101137700/181662860-2b7d646c-eb10-40ba-b259-1e8a4fddf198.png)
 
